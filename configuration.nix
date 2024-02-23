@@ -87,8 +87,9 @@ virtualisation.oci-containers = {
                           ARM_UID = "1001";
                           ARM_GID = "1001";
                         };
-                        extraOptions = ["--privileged" 
-                                        "--device=/dev/sr0:/dev/sr0"
+                        extraOptions = [
+                                          "--privileged" 
+                                          "--device=/dev/sr0:/dev/sr0"
                                        ];
                   };
 
