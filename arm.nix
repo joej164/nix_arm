@@ -17,15 +17,24 @@ users.users.arm = {
         uid = 1001;
         homeMode = "755";
         group = "arm";
+        extraGroups = ["cdrom" "video"];
 };
 
 # Creating folders in home directory
 systemd.tmpfiles.rules = [
         "d /home/arm/music 0755 arm arm"
+        "d /home/arm/Music 0755 arm arm"
         "d /home/arm/logs 0755 arm arm"
         "d /home/arm/media 0755 arm arm"
+        "d /home/arm/media/raw 0755 arm arm"
+        "d /home/arm/media/transcode 0755 arm arm"
+        "d /home/arm/media/transcode/movies 0755 arm arm"
+        "d /home/arm/media/transcode/unidentified 0755 arm arm"
+        "d /home/arm/media/completed 0755 arm arm"
+        "d /home/arm/movies 0755 arm arm"
         "d /home/arm/config 0755 arm arm"
         "d /home/arm/db 0755 arm arm"
+
 ];
 
 virtualisation.docker.enable = true;
@@ -52,7 +61,7 @@ virtualisation.oci-containers = {
                         extraOptions = [
                                           "--privileged" 
                                           "--device=/dev/sr0:/dev/sr0"
-                                          "--device=/dev/sr0:/dev/sr1"
+                                          "--device=/dev/sr1:/dev/sr1"
                                        ];
                   };
 
