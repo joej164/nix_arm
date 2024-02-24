@@ -1,99 +1,116 @@
-{ config, pkgs, ... }:
+# Edit this configuration file to define what should be installed on
+# your system. Help is available in the configuration.nix(5) man page, on
+# https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
+
+# Joe: this is a backup of the default configuration.nix file on 23-Feb-2024
+
+{ config, lib, pkgs, ... }:
 
 {
-  imports = [ <nixpkgs/nixos/modules/installer/virtualbox-demo.nix> ];
+  imports =
+    [ # Include the results of the hardware scan.
+      ./hardware-configuration.nix
+    ];
 
-  # Let demo build as a trusted user.
-# nix.settings.trusted-users = [ "demo" ];
+  # Use the systemd-boot EFI boot loader.
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 
-# Mount a VirtualBox shared folder.
-# This is configurable in the VirtualBox menu at
-# Machine / Settings / Shared Folders.
-# fileSystems."/mnt" = {
-#   fsType = "vboxsf";
-#   device = "nameofdevicetomount";
-#   options = [ "rw" ];
-# };
+  networking.hostName = "arm"; # Define your hostname.
+  # Pick only one of the below networking options.
+  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  # networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
 
-# By default, the NixOS VirtualBox demo image includes SDDM and Plasma.
-# If you prefer another desktop manager or display manager, you may want
-# to disable the default.
-# services.xserver.desktopManager.plasma5.enable = lib.mkForce false;
-# services.xserver.displayManager.sddm.enable = lib.mkForce false;
+  # Set your time zone.
+  time.timeZone = "America/Los_Angeles";
 
-# Enable GDM/GNOME by uncommenting above two lines and two lines below.
-# services.xserver.displayManager.gdm.enable = true;
-# services.xserver.desktopManager.gnome.enable = true;
+  # Configure network proxy if necessary
+  # networking.proxy.default = "http://user:password@proxy:port/";
+  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
-# Set your time zone.
-time.timeZone = "America/Los_Angeles";
+  # Select internationalisation properties.
+  # i18n.defaultLocale = "en_US.UTF-8";
+  # console = {
+  #   font = "Lat2-Terminus16";
+  #   keyMap = "us";
+  #   useXkbConfig = true; # use xkb.options in tty.
+  # };
 
-# List packages installed in system profile. To search, run:
-# \$ nix search wget
-environment.systemPackages = with pkgs; [
-   wget
-   vim
-   jellyfin
-   jellyfin-web
-   jellyfin-ffmpeg
-   lsscsi
- ];
-
-# Enable the OpenSSH daemon.
-# services.openssh.enable = true;
-services.jellyfin = {
-  enable=true;
-  openFirewall = true;
-};
+  # Enable the X11 windowing system.
+  # services.xserver.enable = true;
 
 
-users.groups.arm.gid = 1001;
+  
 
-users.users.arm = {
-        isNormalUser = true;
-        home = "/home/arm";
-        uid = 1001;
-        homeMode = "755";
-        group = "arm";
-};
+  # Configure keymap in X11
+  # services.xserver.xkb.layout = "us";
+  # services.xserver.xkb.options = "eurosign:e,caps:escape";
 
-# Creating folders in home directory
-systemd.tmpfiles.rules = [
-        "d /home/arm/music 0755 arm arm"
-        "d /home/arm/logs 0755 arm arm"
-        "d /home/arm/media 0755 arm arm"
-        "d /home/arm/config 0755 arm arm"
-        "d /home/arm/db 0755 arm arm"
-];
+  # Enable CUPS to print documents.
+  # services.printing.enable = true;
 
-virtualisation.docker.enable = true;
-users.extraGroups.docker.members = [ "demo" ];
+  # Enable sound.
+  # sound.enable = true;
+  # hardware.pulseaudio.enable = true;
 
-virtualisation.oci-containers = {
-        backend = "docker";
-        containers = {
-                arm = {
-                        autoStart = true;
-                        image = "docker.io/automaticrippingmachine/automatic-ripping-machine";
-                        volumes = [
-                          "/home/arm:/home/arm"
-                          "/home/arm/music:/home/arm/music"
-                          "/home/arm/logs:/home/arm/logs"
-                          "/home/arm/media:/home/arm/media"
-                          "/home/arm/config:/etc/arm/config"
-                        ];
-                        ports = ["8080:8080"];
-                        environment = {
-                          ARM_UID = "1001";
-                          ARM_GID = "1001";
-                        };
-                        extraOptions = [
-                                          "--privileged" 
-                                          "--device=/dev/sr0:/dev/sr0"
-                                       ];
-                  };
+  # Enable touchpad support (enabled default in most desktopManager).
+  # services.xserver.libinput.enable = true;
 
-        };
-};
+  # Define a user account. Don't forget to set a password with ‘passwd’.
+  users.users.joe = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+    # initialPassword = "enterInitialPasswordHere";
+  };
+
+  # List packages installed in system profile. To search, run:
+  # $ nix search wget
+  environment.systemPackages = with pkgs; [
+    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    wget
+  ];
+
+  # Some programs need SUID wrappers, can be configured further or are
+  # started in user sessions.
+  # programs.mtr.enable = true;
+  # programs.gnupg.agent = {
+  #   enable = true;
+  #   enableSSHSupport = true;
+  # };
+
+  # List services that you want to enable:
+
+  # Enable the OpenSSH daemon.
+  services.openssh.enable = true;
+
+  # Open ports in the firewall.
+  # networking.firewall.allowedTCPPorts = [ ... ];
+  # networking.firewall.allowedUDPPorts = [ ... ];
+  # Or disable the firewall altogether.
+  # networking.firewall.enable = false;
+
+  # Copy the NixOS configuration file and link it from the resulting system
+  # (/run/current-system/configuration.nix). This is useful in case you
+  # accidentally delete configuration.nix.
+  system.copySystemConfiguration = true;
+
+  # This option defines the first version of NixOS you have installed on this particular machine,
+  # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
+  #
+  # Most users should NEVER change this value after the initial install, for any reason,
+  # even if you've upgraded your system to a new NixOS release.
+  #
+  # This value does NOT affect the Nixpkgs version your packages and OS are pulled from,
+  # so changing it will NOT upgrade your system.
+  #
+  # This value being lower than the current NixOS release does NOT mean your system is
+  # out of date, out of support, or vulnerable.
+  #
+  # Do NOT change this value unless you have manually inspected all the changes it would make to your configuration,
+  # and migrated your data accordingly.
+  #
+  # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
+  system.stateVersion = "23.11"; # Did you read the comment?
 
 }
+
