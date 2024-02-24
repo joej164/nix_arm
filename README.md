@@ -8,13 +8,21 @@ Sets up the server, downloads docker, configures the file structure, then downlo
 May still need to change permissions on some of the files and directories in the /home/arm directory.  This is also an issue in the notes from the dev
 `chown arm:arm <filename>`
 
-After reboot, the container won't see the drives fully, need to do the command below after each reboot.  Found an article on makemkv webside about needing the sdX and sgX files to get things working.
-`sudo modprobe sg`
-
 ## Post install config
 - Update the settings files with OMDB and TMDB API Keys
 
 ## Things to implement still
-- Figure out a way to run the modprobe command or do what it's doing without the command
 - Install Tailscale
-- Figure out how to map SAMBA Drives to allow the copying of files off the Server
+- Figure out how to map SAMBA Drives to allow the copying of files off the Server (https://nixos.wiki/wiki/Samba)
+
+## Resolved Issues
+
+### SCSI Device Drivers
+After reboot, the container won't see the drives fully, need to do the command below after each reboot.  Found an article on makemkv webside about needing the sdX and sgX files to get things working.
+`sudo modprobe sg`
+
+Solution was to load the `sg` kernel driver at boot
+
+### Intel Quicksync Support
+As of 24-Feb-2024 the Dockerimage does not support Intel Quicksync
+- Add Quicksync support (https://forum.openmediavault.org/index.php?thread/38696-how-to-activate-intel-quick-sync-in-docker-jellyfin-handbrake/)

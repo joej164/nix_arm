@@ -7,7 +7,17 @@
 # \$ nix search wget
 environment.systemPackages = with pkgs; [
    lsscsi
+
+   # The following are for Intel QSV, but docker image doesn't support
+   intel-vaapi-driver	
+   libva
+   libdrm
  ];
+
+
+# this config is to load the SCSI generic drives at boot
+# turns out MakeMKV needs both the sdX and sgX files to work
+boot.kernelModules = [ "sg" ];
 
 users.groups.arm.gid = 1001;
 
@@ -21,6 +31,10 @@ users.users.arm = {
 };
 
 # Creating folders in home directory
+# The base image ends up creating a lot of the folders as root, so this makes sure
+# the folders are setup with the right permissions
+#
+# NOTE: likely will also have to change permissions in files in the /home/arm/config directory (see readme)
 systemd.tmpfiles.rules = [
         "d /home/arm/music 0755 arm arm"
         "d /home/arm/Music 0755 arm arm"
@@ -61,7 +75,11 @@ virtualisation.oci-containers = {
                         extraOptions = [
                                           "--privileged" 
                                           "--device=/dev/sr0:/dev/sr0"
+                                          "--device=/dev/sg0:/dev/sg0"
                                           "--device=/dev/sr1:/dev/sr1"
+                                          "--device=/dev/sg1:/dev/sg1"
+                                          "--device=/dev/dri/renderD128:/dev/dri/renderD128"	# For intel quicksync
+                                          "--device=/dev/dri/card0:/dev/dri/card0"		# For intel quicksync
                                        ];
                   };
 
