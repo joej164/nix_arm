@@ -11,6 +11,10 @@ Process
 - Run `nixos-rebuild switch`
 - Reboot the machine
 - Run `nixos-rebuild switch` again
+- Verify the container is running (docker ps)
+- Update the owner of the /home/arm/config files
+- Update the owner of the /home/arm/jellyfin folder if needed
+- Put the API keys into ARM
 
 ## Issues
 May still need to change permissions on some of the files and directories in the /home/arm directory.  This is also an issue in the notes from the dev, specifically the files in the /home/arm/config folder.
