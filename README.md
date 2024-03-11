@@ -4,8 +4,16 @@ NixOS Config to get Automatic Ripping Machine running on my server
 ## Overview
 Sets up the server, downloads docker, configures the file structure, then downloads the Docker Image and installs it on the server and sets it to auto run.
 
+Process
+- Install NixOS on the machine
+- Copy over arm.nix, samba-client.nix, samba-secrets
+- Update samba-secrets
+- Run `nixos-rebuild switch`
+- Reboot the machine
+- Run `nixos-rebuild switch` again
+
 ## Issues
-May still need to change permissions on some of the files and directories in the /home/arm directory.  This is also an issue in the notes from the dev
+May still need to change permissions on some of the files and directories in the /home/arm directory.  This is also an issue in the notes from the dev, specifically the files in the /home/arm/config folder.
 `chown arm:arm <filename>`
 
 ## Post install config
